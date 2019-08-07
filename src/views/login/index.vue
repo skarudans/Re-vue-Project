@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import store from '@/store'
 export default {
   data () {
     const checkmobile = (rule, value, callback) => {
@@ -43,20 +44,35 @@ export default {
         ],
         code: [
           { required: true, message: '请输入验证码', trigger: 'blur' },
-          { len: 6, message: '正确书写', trigger: 'blur' }
+          { len: 6, message: '长度是6位', trigger: 'blur' }
         ]
       }
     }
   },
   methods: {
     onsub () {
-      this.$refs.loginform.validate(valid => {
+      this.$refs.loginform.validate(async valid => {
         if (valid) {
-          this.$http.post('http://ttapi.research.itcast.cn/mp/v1_0/authorizations', this.loginform).then(res => {
-            this.$router.push('./')
-          }).catch(() => {
-            this.$message.error('信息输入错误')
-          })
+          // this.$http
+          //   .post(
+          //     'http://ttapi.research.itcast.cn/mp/v1_0/authorizations',
+          //     this.loginform
+          //   )
+          //   .then(res => {
+          //     store.setUser(res.data.data)
+          //     this.$router.push('./')
+          //   })
+          //   .catch(() => {
+          //     this.$message.error('信息输入错误')
+          //   })
+          try {
+            const res = await this.$http.post('authorizations', this.loginform)
+            const data = res.data.data
+            store.setUser(data)
+            this.$router.push('/')
+          } catch (e) {
+            this.$message.error('输入错误全都')
+          }
         }
       })
     }

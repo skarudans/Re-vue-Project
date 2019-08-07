@@ -6,17 +6,18 @@
         <el-menu
           :collapse-transition="false"
           :collapse="isCollapse"
-          default-active="1"
+          default-active="$route.path"
           class="el-menu-vertical-demo"
           background-color="#002033"
           text-color="#fff"
           active-text-color="hotpink"
+          router
         >
-          <el-menu-item index="1">
+          <el-menu-item index="/">
             <i class="el-icon-menu"></i>
             <span slot="title">首页</span>
           </el-menu-item>
-          <el-menu-item index="2">
+          <el-menu-item index="/article">
             <i class="el-icon-document"></i>
             <span slot="title">内容管理</span>
           </el-menu-item>
@@ -46,15 +47,15 @@
         <el-header>
           <span class="el-icon-s-fold" @click="slide()"></span>
           <span class="top-text">江苏传媒巴拉巴拉巴拉魔法能量</span>
-          <el-dropdown class="droplist">
+          <el-dropdown class="droplist" @command="changeMenu">
             <span class="el-dropdown-link">
-              <img src="../../assets/images/avatar.jpg" alt />
-              用户名称
+              <img :src="photo" alt />
+              {{name}}
               <i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>个人设置</el-dropdown-item>
-              <el-dropdown-item>退出登录</el-dropdown-item>
+              <el-dropdown-item icon="el-icon-setting" command="setting">个人设置</el-dropdown-item>
+              <el-dropdown-item icon="el-icon-unlock" command="logout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </el-header>
@@ -67,13 +68,31 @@
 </template>
 
 <script>
+import store from '@/store'
 export default {
   data () {
-    return { isCollapse: false }
+    return { isCollapse: false,
+      name: '',
+      photo: '' }
+  },
+  created () {
+    const user = store.getUser()
+    this.name = user.name
+    this.photo = user.photo
   },
   methods: {
     slide () {
       this.isCollapse = !this.isCollapse
+    },
+    setting () {
+      this.$router.push({ name: 'setting' })
+    },
+    logout () {
+      store.clearUser()
+      this.$router.push({ name: 'login' })
+    },
+    changeMenu (TypeMenu) {
+      this[TypeMenu]()
     }
   }
 }
